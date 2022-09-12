@@ -3,6 +3,9 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = "007hfhumiafjplfmjfmvimxvjfvmfjkfmv"
+
 app.use(cors());
 require("./userDetails");
 app.use(express.json());
@@ -39,6 +42,37 @@ app.post("/register", async (req, res) => {
     res.send({ status: "Error" });
   }
 });
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.json({error: "User Not found"})
+  }
+  if (await bcrypt.compare(password, user.password)) {
+    const token = jwt.sign({email:user.email}, JWT_SECRET)
+    if (res.status(201)) {
+      return res.json({ status: "ok", data: token });
+    } else {
+      return res.json({error: "error"})
+    }
+  }
+ return res.json({status:"error",error:"Invalid Password"})
+})
+
+app.post("/user", async (req, res) => {
+  const { token } = req.body;
+  try {
+    const user = jwt.verify(token, JWT_SECRET)
+    const userEmail = user.email;
+    User.findOne({ email: userEmail }).then((data) => {
+      res.send({status: "ok", data: data})
+    }).catch((error) => {
+      res.send({status:"error", data:error})
+    })
+  }
+  catch(error){}
+})
 
 app.listen(8000, () => {
   console.log("Server started at 8000");

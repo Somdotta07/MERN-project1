@@ -4,6 +4,7 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import Login from './components/Login'
 import SignUp from './components/Signup'
+import User from "./components/User"
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
               <Route exact path="/" element={<Login />} />
               <Route path="/sign-in" element={<Login />} />
               <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/user" element={<User />} />
             </Routes>
           </div>
         </div>
